@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Star, Zap, Shield, Crown } from 'lucide-react';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const PaymentModal = ({ onClose }) => {
     const [loading, setLoading] = useState(false);
+    const { user } = useAuth();
 
     const loadScript = (src) => {
         return new Promise((resolve) => {
@@ -41,6 +43,11 @@ const PaymentModal = ({ onClose }) => {
                 name: 'AI Resume Builder',
                 description: 'Premium Upgrade',
                 order_id: order.id,
+                prefill: {
+                    name: user?.fullName || '',
+                    email: user?.email || '',
+                    contact: ''
+                },
                 handler: async function (response) {
                     try {
                         const data = {
@@ -61,6 +68,14 @@ const PaymentModal = ({ onClose }) => {
                     color: '#ec4899', // Pink-500
                 },
             };
+
+            // DEBUG: Check if key is correct
+            const keyUsed = options.key;
+            if (keyUsed === 'rzp_test_placeholder') {
+                alert("CRITICAL ERROR: Razorpay Key is MISSING in Vercel Environment Variables. Using placeholder.");
+            } else {
+                console.log("Using Key:", keyUsed);
+            }
 
             const paymentObject = new window.Razorpay(options);
             paymentObject.open();
