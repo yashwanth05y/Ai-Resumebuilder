@@ -19,6 +19,8 @@ const PaymentModal = ({ onClose }) => {
     const handlePayment = async () => {
         setLoading(true);
         const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        console.log("Initiating payment with API_URL:", API_URL);
+
         const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
 
         if (!res) {
@@ -29,6 +31,7 @@ const PaymentModal = ({ onClose }) => {
 
         try {
             // In production, use env variable for backend URL
+            console.log(`Sending request to: ${API_URL}/api/create-order`);
             const { data: order } = await axios.post(`${API_URL}/api/create-order`);
 
             const options = {
@@ -50,8 +53,8 @@ const PaymentModal = ({ onClose }) => {
                         alert('Welcome to Premium! All features unlocked.');
                         onClose();
                     } catch (error) {
-                        console.error(error);
-                        alert('Payment verification failed');
+                        console.error("Verification Error:", error);
+                        alert(`Payment verification failed: ${error.message}`);
                     }
                 },
                 theme: {
@@ -62,8 +65,9 @@ const PaymentModal = ({ onClose }) => {
             const paymentObject = new window.Razorpay(options);
             paymentObject.open();
         } catch (error) {
-            console.error(error);
-            alert('Could not initiate payment. Make sure backend is running on port 5000.');
+            console.error("Payment Order Error:", error);
+            const errorMessage = error.response?.data?.message || error.message;
+            alert(`Payment Error: ${errorMessage}\nAttempted URL: ${API_URL}`);
         } finally {
             setLoading(false);
         }
