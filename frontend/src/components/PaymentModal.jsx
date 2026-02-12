@@ -71,10 +71,16 @@ const PaymentModal = ({ onClose }) => {
 
             // DEBUG: Check if key is correct
             const keyUsed = options.key;
+            console.log("Frontend Key:", keyUsed);
+            console.log("Order ID:", order.id);
+
+            // ALERT THE USER FOR DEBUGGING
+            alert(`DEBUG INFO:\nFrontend Key: ${keyUsed}\nOrder ID: ${order.id}\n\nClick OK to open Razorpay.`);
+
             if (keyUsed === 'rzp_test_placeholder') {
-                alert("CRITICAL ERROR: Razorpay Key is MISSING in Vercel Environment Variables. Using placeholder.");
-            } else {
-                console.log("Using Key:", keyUsed);
+                alert("CRITICAL ERROR: Razorpay Key is MISSING in Vercel Environment Variables.");
+                setLoading(false);
+                return;
             }
 
             const paymentObject = new window.Razorpay(options);
